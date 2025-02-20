@@ -47,7 +47,7 @@ class AuthController extends Controller
         $validateUser = Validator::make(
             $request->all(),[
                 'email'=>'required|email',
-                'password'=>'required',
+                'password' => 'required|string|min:3',
             ]
         );
         if($validateUser->fails()){
@@ -55,7 +55,7 @@ class AuthController extends Controller
                 'status'=>false,
                 'message'=>'Authentication Fails',
                 'errors'=>$validateUser->errors()->all()
-            ],404);
+            ],422);
         }
         if(Auth::attempt(['email' => $request->email, 'password' => $request->password ])){
             $authUser = Auth::user();
@@ -73,13 +73,23 @@ class AuthController extends Controller
             ],401);
         }
     }
-    public function logout(Request $request){
+    public function logout(Request $request)
+    {
         $user = $request->user();
-        $user = tokens()->delete();
+        $user->tokens()->delete();
         return response()->json([
-            'status'=>true,
-            'user'=>$user,
-            'message'=>'Yourlogged out successfully',
-        ],200);
+            'status' => true,
+            'message' => 'You have logged out successfully',
+        ], 200);
     }
+    /*
+        public function logout(Request $request)
+        {
+            $request->user()->currentAccessToken()->delete();
+            return response()->json([
+                'status' => true,
+                'message' => 'You have logged out successfully',
+            ], 200);
+        }
+    */
 }
