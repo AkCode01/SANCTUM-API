@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\API;
-
 use App\Http\Controllers\Controller;
 use App\Models\User;
 
@@ -11,6 +10,15 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+    public function getAllUsers()
+    {
+        $users = User::select('name', 'email')->get();
+        return response()->json([
+            'status' => true,
+            'message' => 'Users retrieved successfully',
+            'users' => $users,
+        ], 200);
+    }
     public function signup(Request $request)
     {
         $validateUser = Validator::make(
