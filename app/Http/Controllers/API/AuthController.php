@@ -11,13 +11,14 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    public function signup(Request $request){
+    public function signup(Request $request)
+    {
         $validateUser = Validator::make(
             $request->all(),
             [
-                'name' => 'required',
-                'email'=>'required|email|unique:users,email',
-                'password'=>'required',
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255|unique:users,email',
+                'password' => 'required|string|min:3',
             ]
         );
         if($validateUser->fails()){
@@ -25,21 +26,24 @@ class AuthController extends Controller
                 'status'=>false,
                 'message'=>'Validation Error',
                 'errors'=>$validateUser->errors()->all()
-            ],401);
+            ],422);
         }
 
         $user = User::create([
             'name'=>$request->name,
             'email'=>$request->email,
             'password'=>$request->password,
+            // 'password' => Hash::make($request->password),
+            // this used in model: 'password' => 'hashed',
         ]);
         return response()->json([
-            'status'=>false,
+            'status'=>true,
             'message'=>'User Created Successfully',
             'user'=>$user,        
-        ],200);
+        ],201);
     }
-    public function login(Request $request){
+    public function login(Request $request)
+    {
         $validateUser = Validator::make(
             $request->all(),[
                 'email'=>'required|email',
